@@ -63,3 +63,7 @@ suites:
     run_list:
       - recipe[audit::default]
     attributes:
+      audit:
+        profiles:
+          base/ssh: true
+          base/linux: true

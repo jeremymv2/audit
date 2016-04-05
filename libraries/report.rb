@@ -17,6 +17,7 @@ class ComplianceReport < Chef::Resource
   # to override the node this report is reported for
   property :node, String # default: node.name
   property :environment, String # default: node.environment
+  property :organization, String
 
   default_action :execute
 
@@ -28,13 +29,25 @@ class ComplianceReport < Chef::Resource
       blob[:reports] = reports
       blob[:profiles] = ownermap
 
-      Chef::Config[:verify_api_cert] = false
-      Chef::Config[:ssl_verify_mode] = :verify_none
+      if token
+        url = construct_url(::File.join('/chef/organizations', org, 'inspec'), server)
+        req = Net::HTTP::Post.new(url, { 'Authorization' => "Bearer #{token}" })
+        req.body = blob.to_json
 
-      url = construct_url(::File.join('/organizations', org, 'inspec'))
-      # Chef::Log.debug "url: #{url}"
-      rest = Chef::ServerAPI.new(url, Chef::Config)
-      rest.post(url, blob)
+        Net::HTTP.start(url.host, url.port) do |http|
+          http.use_ssl = url.scheme == 'https'
+          http.verify_mode = OpenSSL::SSL::VERIFY_NONE # FIXME
+
+          http.request(req)
+        end
+      else
+        Chef::Config[:verify_api_cert] = false
+        Chef::Config[:ssl_verify_mode] = :verify_none
+
+        url = construct_url(::File.join('/organizations', org, 'inspec'))
+        rest = Chef::ServerAPI.new(url, Chef::Config)
+        rest.post(url, blob)
+      end
     end
   end
 
@@ -72,6 +85,6 @@ class ComplianceReport < Chef::Resource
   end
 
   def org
-    Chef::Config[:chef_server_url].split('/').last
+    organization || Chef::Config[:chef_server_url].split('/').last
   end
 end
