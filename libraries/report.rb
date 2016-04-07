@@ -10,14 +10,13 @@ class ComplianceReport < Chef::Resource
   # to use a chef-compliance server that is _not_ "colocated" with chef-server
   property :server, URI
   property :port, Integer
-  property :username, String
-  property :password, String
   property :token, String
+  property :direct, kind_of: [TrueClass, FalseClass], default: false
 
   # to override the node this report is reported for
   property :node, String # default: node.name
   property :environment, String # default: node.environment
-  property :organization, String
+  property :owner, String
 
   default_action :execute
 
@@ -29,8 +28,15 @@ class ComplianceReport < Chef::Resource
       blob[:reports] = reports
       blob[:profiles] = ownermap
 
+      # resolve owner
+      o = return_or_guess_owner
+
       if token
-        url = construct_url(::File.join('/chef/organizations', org, 'inspec'), server)
+        if direct
+          url = construct_url(::File.join('/owners', o, 'inspec'), server)
+        else
+          url = construct_url(::File.join('/chef/organizations', o, 'inspec'), server)
+        end
         req = Net::HTTP::Post.new(url, { 'Authorization' => "Bearer #{token}" })
         req.body = blob.to_json
 
@@ -44,7 +50,7 @@ class ComplianceReport < Chef::Resource
         Chef::Config[:verify_api_cert] = false
         Chef::Config[:ssl_verify_mode] = :verify_none
 
-        url = construct_url(::File.join('/organizations', org, 'inspec'))
+        url = construct_url(::File.join('/organizations', o, 'inspec'))
         rest = Chef::ServerAPI.new(url, Chef::Config)
         rest.post(url, blob)
       end
@@ -84,7 +90,7 @@ class ComplianceReport < Chef::Resource
     }
   end
 
-  def org
-    organization || Chef::Config[:chef_server_url].split('/').last
+  def return_or_guess_owner
+    owner || Chef::Config[:chef_server_url].split('/').last
   end
 end
