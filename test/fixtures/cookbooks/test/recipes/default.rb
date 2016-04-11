@@ -35,6 +35,6 @@ end
 compliance_report 'chef-server' do
   server URI.parse(ENV['COMPLIANCE_API'])
   token token
-  direct true
+  variant :compliance
   owner 'admin'
 end if node['audit']['profiles'].values.any?

@@ -11,7 +11,7 @@ class ComplianceReport < Chef::Resource
   property :server, URI
   property :port, Integer
   property :token, String
-  property :direct, kind_of: [TrueClass, FalseClass], default: false
+  property :variant, Symbol, default: :chef # :chef, :compliance
 
   # to override the node this report is reported for
   property :node, String # default: node.name
@@ -32,10 +32,12 @@ class ComplianceReport < Chef::Resource
       o = return_or_guess_owner
 
       if token
-        if direct
+        if variant == :compliance
           url = construct_url(::File.join('/owners', o, 'inspec'), server)
-        else
+        elsif variant == :chef
           url = construct_url(::File.join('/chef/organizations', o, 'inspec'), server)
+        else
+          raise "Provided unknown variant: #{variant}"
         end
         req = Net::HTTP::Post.new(url, { 'Authorization' => "Bearer #{token}" })
         req.body = blob.to_json
