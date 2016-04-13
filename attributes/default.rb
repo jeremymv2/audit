@@ -16,4 +16,8 @@
 # limitations under the License.
 #
 
+default['audit']['server'] = nil
+default['audit']['api_token'] = nil
+default['audit']['variant'] = :chef
+default['audit']['owner'] = nil
 default['audit']['profiles'] = {}

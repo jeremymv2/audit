@@ -16,8 +16,6 @@ class ComplianceProfile < Chef::Resource # rubocop:disable Metrics/ClassLength
   # to use a chef-compliance server that is _not_ "colocated" with chef-server
   property :server, URI
   property :port, Integer
-  property :username, String
-  property :password, String
   property :token, String
   # TODO(sr) it might be nice to default to settings from attributes
 
