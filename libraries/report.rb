@@ -13,8 +13,6 @@ class ComplianceReport < Chef::Resource
   property :token, String
   property :variant, String, default: 'chef' # 'chef', 'compliance'
 
-  # to override the node this report is reported for
-  property :node, String # default: node.name
   property :environment, String # default: node.environment
   property :owner, String
 
