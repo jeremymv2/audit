@@ -35,16 +35,24 @@ class ComplianceProfile < Chef::Resource # rubocop:disable Metrics/ClassLength
         action :install
       end
 
+      # load the supermarket plugin
       require 'inspec'
+      require 'bundles/inspec-supermarket/api'
+      require 'bundles/inspec-supermarket/target'
       check_inspec
     end
 
+    converge_by 'create/verify cache directory' do
+      directory(::File.join(Chef::Config[:file_cache_path], 'compliance')).run_action(:create)
+    end
+
     converge_by 'fetch compliance profile' do
+      return if path # will be fetched from other source during execute phase
+
       o, p = normalize_owner_profile
       Chef::Log.info "Fetch compliance profile #{o}/#{p}"
 
       path = tar_path
-      directory(::Pathname.new(path).dirname.to_s).run_action(:create)
 
       if token # go direct
         reqpath ="owners/#{o}/compliance/#{p}/tar"
@@ -92,19 +100,21 @@ class ComplianceProfile < Chef::Resource # rubocop:disable Metrics/ClassLength
       check_inspec
     end
 
-    converge_by 'execute compliance profile' do
-      path = tar_path
+    converge_by 'create/verify cache directory' do
+      directory(::File.join(Chef::Config[:file_cache_path], 'compliance')).run_action(:create)
+    end
 
-      unless ::File.exist?(path)
+    converge_by 'execute compliance profile' do
+      path ||= tar_path
+      report_file = report_path
+
+      if URI(path).scheme !~ /(https|supermarket|compliance)/ && ! ::File.exist?(path)
         Chef::Log.warn "No such file: #{path}"
         fail "Aborting since profile is not present here: #{path}" if run_context.node.audit.fail_if_not_present
         return
       end
 
-      report_file = report_path
-
-      o, p = normalize_owner_profile
-      Chef::Log.info "Execute compliance profile #{o}/#{p}"
+      Chef::Log.warn "Executing: #{path}"
 
       # TODO: flesh out inspec's report CLI interface,
       #       make this an execute[inspec check ...]
@@ -136,7 +146,7 @@ class ComplianceProfile < Chef::Resource # rubocop:disable Metrics/ClassLength
 
   def normalize_owner_profile
     if profile.include?('/')
-      profile.split('/')
+      profile.split('/').last(2)
     else
       [owner || 'base', profile]
     end
