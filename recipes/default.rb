@@ -25,12 +25,14 @@ node['audit']['profiles'].each do |owner_profile, enabled|
   next unless enabled
   fail "Invalid profile name '#{owner_profile}'. "\
        "Must contain /, e.g. 'john/ssh'" if owner_profile !~ %r{\/}
-  o, p = owner_profile.split('/')
+  path = owner_profile =~ %r{://|^(\/)} ? owner_profile : nil
+  o, p = owner_profile.split('/').last(2)
 
   compliance_profile p do
     owner o
     server server
     token token
+    path path if path
     inspec_version node['audit']['inspec_version']
     action [:fetch, :execute]
   end
