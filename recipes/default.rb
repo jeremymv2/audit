@@ -25,7 +25,7 @@ node['audit']['profiles'].each do |owner_profile, enabled|
   next unless enabled
   fail "Invalid profile name '#{owner_profile}'. "\
        "Must contain /, e.g. 'john/ssh'" if owner_profile !~ %r{\/}
-  path = owner_profile =~ %r{://|^(\/)} ? owner_profile : nil
+  path = owner_profile =~ %r{(://|^\/)} ? owner_profile : nil
   o, p = owner_profile.split('/').last(2)
 
   compliance_profile p do
