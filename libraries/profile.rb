@@ -42,7 +42,7 @@ class ComplianceProfile < Chef::Resource # rubocop:disable Metrics/ClassLength
       check_inspec
     end
 
-    converge_by 'create/verify cache directory' do
+    converge_by 'create cache directory' do
       directory(::File.join(Chef::Config[:file_cache_path], 'compliance')).run_action(:create)
     end
 
