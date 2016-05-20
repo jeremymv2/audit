@@ -21,18 +21,21 @@ token = node['audit']['token']
 server = node['audit']['server']
 
 # iterate over all selected profiles
-node['audit']['profiles'].each do |owner_profile, enabled|
-  next unless enabled
-  fail "Invalid profile name '#{owner_profile}'. "\
-       "Must contain /, e.g. 'john/ssh'" if owner_profile !~ %r{\/}
-  path = owner_profile =~ %r{(://|^\/)} ? owner_profile : nil
+node['audit']['profiles'].each do |owner_profile, value|
+  case value
+  when Hash
+    next if value['enabled'] == false
+    path = value['source'] =~ %r{(://|^/)} ? value['source'] : nil
+  when [TrueClass, FalseClass]
+    next if value == false
+  end
   o, p = owner_profile.split('/').last(2)
 
   compliance_profile p do
     owner o
     server server
     token token
-    path path if path
+    path path unless path.nil?
     inspec_version node['audit']['inspec_version']
     quiet node['audit']['quiet'] unless node['audit']['quiet'].nil?
     action [:fetch, :execute]
