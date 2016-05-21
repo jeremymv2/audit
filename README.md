@@ -72,15 +72,20 @@ Once the cookbook is available in Chef Server, you need to add the `audit::defau
         'source' => 'supermarket://hardening/ssh-hardening',
         'key' => 'value',
       },
+      # Windows path
+      'brewinc/win2012_audit' => {
+        # filesystem path
+        'source' => 'E:/profiles/win2012_audit',
+      },
       'brewinc/tmp_compliance_profile' => {
         # github
         'source' => 'https://github.com/nathenharvey/tmp_compliance_profile',
       },
-      # disable
+      # disable profile
       'brewinc/tmp_compliance_profile-master' => {
         # filesystem path
         'source' => '/tmp/tmp_compliance_profile-master',
-        'enabled' => false,
+        'disabled' => true,
       },
     },
   }

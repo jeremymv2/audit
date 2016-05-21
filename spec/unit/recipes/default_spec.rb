@@ -91,6 +91,7 @@ describe 'audit::default' do
       runner = ChefSpec::ServerRunner.new(platform: 'centos', version: '6.5')
       runner.node.set['audit']['profiles'] = {
         'base/linux' => true,
+        'base/apache' => false,
         'brewinc/ssh-hardening' => {
           'source' => 'supermarket://hardening/ssh-hardening',
         },
@@ -101,7 +102,7 @@ describe 'audit::default' do
           'source' => '/tmp/tmp_compliance_profile-master',
         },
         'exampleorg/myprofile' => {
-          'enabled' => false,
+          'disabled' => true,
         },
       }
       runner.converge(described_recipe)

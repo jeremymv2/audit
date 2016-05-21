@@ -108,13 +108,14 @@ class ComplianceProfile < Chef::Resource # rubocop:disable Metrics/ClassLength
       path ||= tar_path
       report_file = report_path
 
-      if path =~ %r{^/} && ! ::File.exist?(path)
-        Chef::Log.warn "No such file: #{path}"
+      supported_schemes = w%(http https supermarket compliance chefserver)
+      if !supported_schemes.include?(URI(path).scheme) && !::File.exist?(path)
+        Chef::Log.warn "No such path! Skipping: #{path}"
         fail "Aborting since profile is not present here: #{path}" if run_context.node.audit.fail_if_not_present
         return
       end
 
-      Chef::Log.warn "Executing: #{path}"
+      Chef::Log.info "Executing: #{path}"
 
       # TODO: flesh out inspec's report CLI interface,
       #       make this an execute[inspec check ...]

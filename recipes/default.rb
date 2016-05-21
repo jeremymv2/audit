@@ -24,8 +24,8 @@ server = node['audit']['server']
 node['audit']['profiles'].each do |owner_profile, value|
   case value
   when Hash
-    next if value['enabled'] == false
-    path = value['source'] =~ %r{(://|^/)} ? value['source'] : nil
+    next if value['disabled']
+    path = value['source']
   else
     next if value == false
   end
