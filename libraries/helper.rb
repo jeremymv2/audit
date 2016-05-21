@@ -22,7 +22,7 @@ module ComplianceHelpers
     begin
       return yield
     rescue Net::HTTPServerException => e
-      case e.message
+      case e.response.code
       when /401/
         Chef::Log.error "Possible time/date issue on the client."
       when /403/
