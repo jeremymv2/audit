@@ -26,9 +26,11 @@ node['audit']['profiles'].each do |owner_profile, value|
   when Hash
     next if value['enabled'] == false
     path = value['source'] =~ %r{(://|^/)} ? value['source'] : nil
-  when [TrueClass, FalseClass]
+  else
     next if value == false
   end
+  fail "Invalid profile name '#{owner_profile}'. "\
+       "Must contain /, e.g. 'john/ssh'" if owner_profile !~ %r{\/}
   o, p = owner_profile.split('/').last(2)
 
   compliance_profile p do
