@@ -108,7 +108,7 @@ class ComplianceProfile < Chef::Resource # rubocop:disable Metrics/ClassLength
       path ||= tar_path
       report_file = report_path
 
-      supported_schemes = w%(http https supermarket compliance chefserver)
+      supported_schemes = %w{http https supermarket compliance chefserver}
       if !supported_schemes.include?(URI(path).scheme) && !::File.exist?(path)
         Chef::Log.warn "No such path! Skipping: #{path}"
         fail "Aborting since profile is not present here: #{path}" if run_context.node.audit.fail_if_not_present

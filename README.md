@@ -83,7 +83,6 @@ Once the cookbook is available in Chef Server, you need to add the `audit::defau
       },
       # disable profile
       'brewinc/tmp_compliance_profile-master' => {
-        # filesystem path
         'source' => '/tmp/tmp_compliance_profile-master',
         'disabled' => true,
       },
