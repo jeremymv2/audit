@@ -15,26 +15,26 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# inspec gem version to install
+# controls inspec gem version to install
 # example values: '1.1.0', 'latest'
 default['audit']['inspec_version'] = '1.2.0'
 
-# URI to alternate gem source
+# sets URI to alternate gem source
 # example values: nil, 'https://mygem.server.com'
 # notes: the root of the URL must host the *specs.4.8.gz source index
 default['audit']['inspec_gem_source'] = nil
 
-# where reports are sent
+# controls where inspec scan reports are sent
 # possible values: 'chef-server', 'chef-compliance', 'chef-visibility', 'chef-server-visibility', 'json-file'
 # notes: 'chef-visibility' requires inspec version 0.27.1 or greater
 default['audit']['collector'] = 'chef-server'
 
-# enable reporting to Chef Visibility with profiles from Chef Compliance
+# controls reporting to Chef Visibility with profiles from Chef Compliance
 # possible values: nil, 'chef-server'
 # notes: requires Chef Server ingtegrated with Chef Compliance
 default['audit']['fetcher'] = nil
 
-# url of ChefeCsompliance server API endpoint
+# url of Chef Compliance server API endpoint
 # example values: nil, 'https://comp-server.example.com/api'
 # notes: only required for 'chef-compliance' collector
 default['audit']['server'] = nil
